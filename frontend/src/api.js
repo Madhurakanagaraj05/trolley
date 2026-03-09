@@ -1,79 +1,91 @@
 // src/api.js
+// Deployed backend base URL
 const API_URL = "https://trolley-q781.onrender.com/api";
 
-// Login
+// Normalized helpers so the UI always gets the shapes it expects
+
+// Login used by Login.jsx – should either return { user } or throw
 export async function login(username, password) {
-  try {
-    const res = await fetch(`${API_URL}/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password })
-    });
-    return await res.json();
-  } catch (err) {
-    console.error(err);
-    return { success: false, message: "Login failed" };
+  const res = await fetch(`${API_URL}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password }),
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Login failed");
   }
+  // UI expects an object with `user`
+  return { user: { id: 1, username: data.username || username } };
 }
 
-// Get all products
+// Get all products (not heavily used in UI, but keep return shape)
 export async function getProducts() {
-  try {
-    const res = await fetch(`${API_URL}/products`);
-    return await res.json();
-  } catch (err) {
-    console.error(err);
-    return { success: false, products: [] };
+  const res = await fetch(`${API_URL}/products`);
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Failed to fetch products");
   }
+  return data.products;
 }
 
-// Get product by barcode
+// Get product by barcode – Scan.jsx expects a single product object
 export async function getProductByBarcode(barcode) {
-  try {
-    const res = await fetch(`${API_URL}/products/barcode/${barcode}`);
-    return await res.json();
-  } catch (err) {
-    console.error(err);
-    return { success: false, product: null };
+  const res = await fetch(`${API_URL}/products/barcode/${encodeURIComponent(barcode)}`);
+  const data = await res.json();
+  if (!res.ok || !data.success || !data.product) {
+    throw new Error(data.message || "Product not found");
   }
+  const p = data.product;
+  return {
+    id: p.id,
+    barcode: p.barcode,
+    name: p.product_name,
+    price: Number(p.price),
+    weightGrams: Number(p.weight) || 0,
+    imageUrl: p.imageUrl || "",
+  };
 }
 
-// Create an order
-export async function createOrder(items, total) {
-  try {
-    const res = await fetch(`${API_URL}/orders`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items, total })
-    });
-    return await res.json();
-  } catch (err) {
-    console.error(err);
-    return { success: false, order: null };
+// Create an order – Payment.jsx expects `{ orderId }`
+export async function createOrder(orderPayload) {
+  const res = await fetch(`${API_URL}/orders`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(orderPayload),
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success || !data.order) {
+    throw new Error(data.message || "Failed to create order");
   }
+  return { orderId: data.order.id };
 }
 
-// Get all orders
+// Get all orders (not critical for current UI)
 export async function getOrders() {
-  try {
-    const res = await fetch(`${API_URL}/orders`);
-    return await res.json();
-  } catch (err) {
-    console.error(err);
-    return { success: false, orders: [] };
+  const res = await fetch(`${API_URL}/orders`);
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Failed to fetch orders");
   }
+  return data.orders;
 }
 
-// Get single order by id
+// Get single order by id – Invoice.jsx expects a rich `order` object
 export async function getOrder(orderId) {
-  try {
-    const res = await fetch(`${API_URL}/orders`);
-    const data = await res.json();
-    if (!data.success) return { success: false, order: null };
-    const order = data.orders.find(o => o.id === Number(orderId));
-    return order ? { success: true, order } : { success: false, order: null };
-  } catch (err) {
-    console.error(err);
-    return { success: false, order: null };
+  const res = await fetch(`${API_URL}/orders/${encodeURIComponent(orderId)}`);
+  const data = await res.json();
+  if (!res.ok || !data.success || !data.order) {
+    throw new Error(data.message || "Order not found");
   }
+  const o = data.order;
+  // Back-end stores the cart payload; normalize to what Invoice.jsx uses
+  return {
+    orderId: o.id,
+    createdAt: o.createdAt || new Date().toISOString(),
+    paymentMode: o.paymentMode || o.payment_mode || "Unknown",
+    paymentStatus: o.paymentStatus || o.payment_status || "PAID",
+    totalAmount: o.totalAmount || o.total || o.total_amount,
+    items: o.items || o.cart || [],
+  };
 }
