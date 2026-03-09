@@ -1,49 +1,67 @@
-const API_URL = "https://trolley-q781.onrender.com/api"; // your backend URL
+// src/api.js
+const API_URL = "https://trolley-q781.onrender.com/api";
 
-// 1️⃣ Login
 export async function login(username, password) {
-  const res = await fetch(`${API_URL}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
-  return res.json();
+  try {
+    const res = await fetch(`${API_URL}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Login error:", err);
+    return { success: false, message: "Login failed" };
+  }
 }
 
-// 2️⃣ Get all products
 export async function getProducts() {
-  const res = await fetch(`${API_URL}/products`);
-  return res.json();
+  try {
+    const res = await fetch(`${API_URL}/products`);
+    if (!res.ok) throw new Error("Network response not OK");
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Failed to fetch products:", err);
+    return { success: false, products: [] };
+  }
 }
 
-// 3️⃣ Get product by barcode
 export async function getProductByBarcode(barcode) {
-  const data = await getProducts();
-  if (!data.success) return null;
-
-  return data.products.find((p) => p.barcode === barcode) || null;
+  try {
+    const res = await fetch(`${API_URL}/products/barcode/${barcode}`);
+    if (!res.ok) throw new Error("Product not found");
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Failed to fetch product by barcode:", err);
+    return { success: false, product: null };
+  }
 }
 
-// 4️⃣ Create a new order
-export async function createOrder(order) {
-  const res = await fetch(`${API_URL}/orders`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(order),
-  });
-  return res.json();
+export async function createOrder(items, total) {
+  try {
+    const res = await fetch(`${API_URL}/orders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items, total })
+    });
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Failed to create order:", err);
+    return { success: false, order: null };
+  }
 }
 
-// 5️⃣ Get all orders
 export async function getOrders() {
-  const res = await fetch(`${API_URL}/orders`);
-  return res.json();
-}
-
-// 6️⃣ Get single order by ID
-export async function getOrder(id) {
-  const data = await getOrders();
-  if (!data.success) return null;
-
-  return data.orders.find(order => order.id === Number(id)) || null;
+  try {
+    const res = await fetch(`${API_URL}/orders`);
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Failed to fetch orders:", err);
+    return { success: false, orders: [] };
+  }
 }
