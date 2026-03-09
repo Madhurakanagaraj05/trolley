@@ -18,8 +18,26 @@ function loadProducts() {
  */
 function getProductByBarcode(barcode) {
   const products = loadProducts();
-  const b = (barcode || '').trim();
-  const row = products.find((p) => String(p.barcode) === b);
+  const raw = (barcode || '').trim();
+
+  // Try exact match first
+  let row = products.find((p) => String(p.barcode) === raw);
+
+  // If not found, try with only digits (some scanners include spaces or other chars)
+  if (!row) {
+    const digits = raw.replace(/\D/g, '');
+    if (digits) {
+      row = products.find((p) => String(p.barcode) === digits);
+    }
+  }
+
+  // Also try ignoring leading zeros (common mismatch)
+  if (!row) {
+    const stripZeros = (s) => s.replace(/^0+/, '') || '0';
+    const cleaned = stripZeros(raw);
+    row = products.find((p) => stripZeros(String(p.barcode)) === cleaned);
+  }
+
   if (!row) return null;
   return {
     id: row.id,
