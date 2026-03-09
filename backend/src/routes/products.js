@@ -1,4 +1,4 @@
-// backend/src/product.js
+// backend/src/routes/product.js
 const express = require("express");
 const {
   getAllProducts,
@@ -11,7 +11,7 @@ const router = express.Router();
 
 /**
  * GET /api/products
- * Returns all products
+ * Get all products
  */
 router.get("/", (req, res) => {
   try {
@@ -24,11 +24,10 @@ router.get("/", (req, res) => {
 
 /**
  * GET /api/products/barcode/:barcode
- * Returns a product by its barcode
+ * Get product by barcode
  */
 router.get("/barcode/:barcode", (req, res) => {
   const { barcode } = req.params;
-
   if (!barcode || !barcode.trim()) {
     return res.status(400).json({ success: false, message: "Barcode required" });
   }
