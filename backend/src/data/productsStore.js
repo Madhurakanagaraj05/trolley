@@ -1,4 +1,4 @@
-// backend/data/productsStore.js
+// All products + order storage
 const products = [
   { id: 1, barcode: "8909106072572", product_name: "CLINIC PLUS", price: 1, weight: 6.5 },
   { id: 2, barcode: "8906057534098", product_name: "MEDIMIX SOAP", price: 45, weight: 100 },
@@ -19,7 +19,7 @@ const products = [
   { id: 17, barcode: "8906002080229", product_name: "Sakthi Coriander Powder", price: 50, weight: 100 }
 ];
 
-const orders = []; // temporary order storage
+const orders = []; // temporary storage
 
 function getAllProducts() {
   return products;
@@ -40,9 +40,4 @@ function getOrderById(id) {
   return orders.find(o => o.id === id);
 }
 
-module.exports = {
-  getAllProducts,
-  getProductByBarcode,
-  addOrder,
-  getOrderById
-};
+module.exports = { getAllProducts, getProductByBarcode, addOrder, getOrderById };

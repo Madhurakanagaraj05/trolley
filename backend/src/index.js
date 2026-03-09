@@ -1,10 +1,9 @@
-// backend/src/index.js
 const express = require("express");
 const cors = require("cors");
 
-// Import routers
-const productRoutes = require("./routes/products"); // make sure file name matches exactly
-const orderRoutes = require("./routes/order");
+// Import routes
+const productRoutes = require("./routes/products");
+const orderRoutes = require("./routes/orders");
 const authRoutes = require("./routes/auth");
 
 const app = express();
@@ -25,6 +24,4 @@ app.get("/", (req, res) => {
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Backend running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
