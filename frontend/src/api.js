@@ -5,16 +5,21 @@ export async function getProducts() {
   return res.json();
 }
 
+export async function getProductByBarcode(barcode) {
+  const res = await fetch(`${API_BASE}/api/products/${barcode}`);
+  return res.json();
+}
+
 export async function login(username, password) {
   const res = await fetch(`${API_BASE}/api/login`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       username: username,
-      password: password
-    })
+      password: password,
+    }),
   });
 
   return res.json();
