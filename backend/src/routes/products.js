@@ -1,10 +1,18 @@
-// backend/src/routes/product.js
+// backend/src/product.js
 const express = require("express");
-const { getAllProducts, getProductByBarcode } = require("../../data/productsStore");
+const {
+  getAllProducts,
+  getProductByBarcode,
+  addOrder,
+  getOrderById
+} = require("../data/productsStore");
 
 const router = express.Router();
 
-// GET /api/products
+/**
+ * GET /api/products
+ * Returns all products
+ */
 router.get("/", (req, res) => {
   try {
     const products = getAllProducts();
@@ -14,10 +22,22 @@ router.get("/", (req, res) => {
   }
 });
 
-// GET /api/products/barcode/:barcode
+/**
+ * GET /api/products/barcode/:barcode
+ * Returns a product by its barcode
+ */
 router.get("/barcode/:barcode", (req, res) => {
-  const product = getProductByBarcode(req.params.barcode);
-  if (!product) return res.status(404).json({ success: false, message: "Product not found" });
+  const { barcode } = req.params;
+
+  if (!barcode || !barcode.trim()) {
+    return res.status(400).json({ success: false, message: "Barcode required" });
+  }
+
+  const product = getProductByBarcode(barcode);
+  if (!product) {
+    return res.status(404).json({ success: false, message: "Product not found" });
+  }
+
   res.json({ success: true, product });
 });
 
