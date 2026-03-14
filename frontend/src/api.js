@@ -44,6 +44,7 @@ export async function getProductByBarcode(barcode) {
     price: Number(p.price),
     weightGrams: Number(p.weight) || 0,
     imageUrl: p.imageUrl || "",
+    expiry: p.expiry || "",
   };
 }
 

@@ -74,6 +74,7 @@ export default function Scan() {
           quantity: scannedProduct.quantity,
           weightGrams: scannedProduct.weightGrams || 0,
           imageUrl: scannedProduct.imageUrl,
+          expiry: scannedProduct.expiry,
         },
       ]);
     }

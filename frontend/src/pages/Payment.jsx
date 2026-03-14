@@ -81,6 +81,7 @@ export default function Payment() {
       quantity: i.quantity,
       subtotal: i.price * i.quantity,
       weightGrams: i.weightGrams || 0,
+      expiry: i.expiry,
     })),
     totalAmount,
     totalWeight,

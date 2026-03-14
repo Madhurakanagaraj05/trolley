@@ -47,11 +47,12 @@ export default function Invoice() {
       i.barcode,
       `₹${i.price.toFixed(2)}`,
       i.quantity,
+      i.expiry,
       `₹${i.subtotal.toFixed(2)}`,
     ]);
     autoTable(doc, {
       startY: totalWeightKg ? 58 : 52,
-      head: [['Product', 'Barcode', 'Price', 'Qty', 'Subtotal']],
+      head: [['Product', 'Barcode', 'MRP', 'Qty', 'Expiry', 'Subtotal']],
       body: tableData,
     });
     const finalY = doc.lastAutoTable.finalY + 10;
@@ -93,8 +94,9 @@ export default function Invoice() {
             <tr>
               <th>Product Name</th>
               <th>Barcode</th>
-              <th>Price</th>
+              <th>MRP</th>
               <th>Quantity</th>
+              <th>Expiry Date</th>
               <th>Subtotal</th>
             </tr>
           </thead>
@@ -105,6 +107,7 @@ export default function Invoice() {
                 <td>{item.barcode}</td>
                 <td>₹{item.price.toFixed(2)}</td>
                 <td>{item.quantity}</td>
+                <td>{item.expiry}</td>
                 <td>₹{item.subtotal.toFixed(2)}</td>
               </tr>
             ))}
